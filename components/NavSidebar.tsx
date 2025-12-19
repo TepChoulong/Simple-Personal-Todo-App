@@ -43,17 +43,17 @@ const NavSidebar = async () => {
     },
     {
       title: "My tasks",
-      url: "/my-tasks",
+      url: "/dashboard/my-tasks",
       icon: <SquareCheckBig />,
     },
     {
       title: "Calendar",
-      url: "/calendar",
+      url: "/dashboard/calendar",
       icon: <CalendarDays />,
     },
     {
       title: "Tags",
-      url: "/tags",
+      url: "/dashboard/tags",
       icon: <Tag />,
     },
   ];
