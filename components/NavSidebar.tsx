@@ -52,8 +52,8 @@ const NavSidebar = async () => {
       icon: <CalendarDays />,
     },
     {
-      title: "Tags",
-      url: "/dashboard/tags",
+      title: "Categories",
+      url: "/dashboard/categories",
       icon: <Tag />,
     },
   ];
