@@ -104,8 +104,6 @@ const AddTask = () => {
     return new Date(date).toISOString().split("T")[0];
   };
 
-  console.log(dataForm);
-
   return (
     <div className="w-[35vw] mx-auto flex flex-col space-y-6">
       <h1 className="text-4xl font-bold">New Task</h1>
