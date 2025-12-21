@@ -19,10 +19,8 @@ import {
 
 import { Bell, Star } from "lucide-react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const categories: string[] = [];
 
 interface Task {
   title: string;
@@ -35,19 +33,27 @@ interface Task {
   is_important: boolean;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+}
+
 const AddTask = () => {
   const router = useRouter();
 
   const [dataForm, setDataForm] = useState<Task>({
     title: "",
     description: "",
-    priority: "LOW",
+    priority: "low",
     category: "uncategorized",
     due_date: null,
     is_completed: false,
     is_reminder: false,
     is_important: false,
   });
+
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -99,10 +105,26 @@ const AddTask = () => {
     }
   };
 
+  console.log(dataForm);
+
   const formatDate = (date: string) => {
-    if (!date) return null;
+    if (date === null) return null;
     return new Date(date).toISOString().split("T")[0];
   };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("/api/v1/category");
+      const data = await res.json();
+      setCategories(data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <div className="w-[35vw] mx-auto flex flex-col space-y-6">
@@ -134,18 +156,16 @@ const AddTask = () => {
             </Label>
             <Select
               value={dataForm.priority}
-              onValueChange={(e) =>
-                setDataForm({ ...dataForm, priority: e.toLowerCase() })
-              }>
+              onValueChange={(e) => setDataForm({ ...dataForm, priority: e })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a priority" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>priorities</SelectLabel>
-                  <SelectItem value="LOW">Low</SelectItem>
-                  <SelectItem value="MEDIUM">Medium</SelectItem>
-                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -164,7 +184,7 @@ const AddTask = () => {
               onChange={(e) =>
                 setDataForm({
                   ...dataForm,
-                  due_date: formatDate(e.target.value),
+                  due_date: e.target.value,
                 })
               }
             />
@@ -227,11 +247,14 @@ const AddTask = () => {
                   {categories.length === 0 ? (
                     <SelectItem value="uncategorized">None</SelectItem>
                   ) : (
-                    categories.map((category: string) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))
+                    <>
+                      <SelectItem value="uncategorized">None</SelectItem>
+                      {categories.map((category: Category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </>
                   )}
                 </SelectGroup>
               </SelectContent>

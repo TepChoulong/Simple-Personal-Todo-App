@@ -89,3 +89,38 @@ export async function DELETE(
     return res.json({ message: "Something went wrong" }, { status: 500 });
   }
 }
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const { isAuthenticated, userId } = await auth();
+
+    if (!isAuthenticated) {
+      return res.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabaseClient = await supabase();
+
+    const { data, error } = await supabaseClient
+      .from("categories")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", userId);
+
+    if (error) {
+      return res.json({ message: error.message }, { status: 500 });
+    }
+
+    return res.json(
+      { message: "Category fetched successfully", data },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("[GET_CATEGORY_BY_ID_ERROR]", error);
+    return res.json({ message: "Something went wrong" }, { status: 500 });
+  }
+}

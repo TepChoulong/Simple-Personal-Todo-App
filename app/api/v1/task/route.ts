@@ -3,7 +3,7 @@ import supabase from "@/utils/supabase";
 import { NextRequest, NextResponse as res } from "next/server";
 
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const new_task_object = {
       title,
       description,
-      due_date: new Date(due_date).toISOString(),
+      due_date: due_date === null ? null : new Date(due_date).toISOString(),
       priority,
       is_completed,
       is_important,
@@ -57,14 +57,45 @@ export async function POST(req: NextRequest) {
       return res.json({ message: error.message }, { status: 400 });
     }
 
+    revalidatePath("/dashboard");
+
     return res.json({ message: "Task created successfully" }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.log("[CREATE_TASK_ERROR]: " + error);
     return res.json(
       {
         message: "Something went wrong",
       },
       { status: 500 }
     );
+  }
+}
+
+export async function GET() {
+  try {
+    const { isAuthenticated, userId } = await auth();
+
+    if (!isAuthenticated) {
+      return res.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabaseClient = await supabase();
+
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      return res.json({ message: error.message }, { status: 500 });
+    }
+
+    return res.json(
+      { message: "Tasks fetched successfully", data },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("[GET_TASK_ERROR]: " + error);
+    return res.json({ message: "Something went wrong" }, { status: 500 });
   }
 }
