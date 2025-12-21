@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 
 import {
@@ -24,10 +22,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Edit } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
-import { Plus } from "lucide-react";
+interface Category {
+  name: string;
+  color: string;
+}
 
 const colors = [
   { name: "IndianRed", color: "#CD5C5C" },
@@ -83,27 +85,29 @@ const colors = [
   },
 ];
 
-interface Category {
-  name: string;
-  color: string;
-}
-
-const AddCategoryBtn = ({ onRefresh }: any) => {
+const EditCategoryBtn = ({
+  onRefresh,
+  category_id,
+  category_name,
+  category_color,
+}: any) => {
   const [dataForm, setDataForm] = useState<Category>({
-    name: "",
-    color: "",
+    name: category_name,
+    color: category_color,
   });
 
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmitCategory = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSaveCategory = async (
+    e: React.FormEvent<HTMLFormElement>,
+    id: string
+  ) => {
     e.preventDefault();
     try {
       setLoading(true);
 
-      const res = await fetch("/api/v1/category", {
-        method: "POST",
+      const res = await fetch(`/api/v1/category/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -118,35 +122,33 @@ const AddCategoryBtn = ({ onRefresh }: any) => {
         return;
       }
 
-      onRefresh();
-
       toast.success(data.message);
       setDataForm({ name: "", color: "" });
-      setOpen(false);
+      onRefresh();
       setLoading(false);
     } catch (error) {
-      setLoading(false);
+      console.error(error);
       toast.error("Something went wrong");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
-        <Button className="font-semibold">
-          <Plus />
-          New Category
+        <Button variant="default">
+          <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Category</DialogTitle>
+          <DialogTitle>Edit Category</DialogTitle>
           <DialogDescription>
-            Add a new category to your account
+            Make changes to your category here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
+
         <form
-          onSubmit={handleSubmitCategory}
+          onSubmit={(e) => handleSaveCategory(e, category_id)}
           className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-2">
             <Label htmlFor="category_name">Name</Label>
@@ -191,10 +193,10 @@ const AddCategoryBtn = ({ onRefresh }: any) => {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Spinner /> <span>Creating....</span>
+                <Spinner /> <span>Saving....</span>
               </>
             ) : (
-              "Create"
+              "Save"
             )}
           </Button>
         </form>
@@ -203,4 +205,4 @@ const AddCategoryBtn = ({ onRefresh }: any) => {
   );
 };
 
-export default AddCategoryBtn;
+export default EditCategoryBtn;

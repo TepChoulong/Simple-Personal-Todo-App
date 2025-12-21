@@ -1,12 +1,9 @@
-import AddCategoryBtn from "./_components/add_category_btn";
+import CategoryTable from "./_components/category_table";
 
 const Categories = () => {
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl">Categories</h1>
-        <AddCategoryBtn />
-      </div>
+    <div className="flex flex-col space-y-6">
+      <CategoryTable />
     </div>
   );
 };
