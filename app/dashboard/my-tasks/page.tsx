@@ -72,17 +72,20 @@ const MyTasks = () => {
                 All
               </AccordionTrigger>
               <AccordionContent>
-                {tasks.length === 0 ? (
+                {tasks.filter((task: any) => task.is_completed === false)
+                  .length === 0 ? (
                   <p>No tasks found</p>
                 ) : (
                   <>
-                    {tasks.map((task: any) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onRefresh={fetchTasks}
-                      />
-                    ))}
+                    {tasks
+                      .filter((task: any) => task.is_completed === false)
+                      .map((task: any) => (
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          onRefresh={fetchTasks}
+                        />
+                      ))}
                   </>
                 )}
               </AccordionContent>
@@ -94,13 +97,20 @@ const MyTasks = () => {
                   {category.name}
                 </AccordionTrigger>
                 <AccordionContent>
-                  {tasks.filter((task: any) => task.category === category.id)
-                    .length === 0 ? (
+                  {tasks.filter(
+                    (task: any) =>
+                      task.category === category.id &&
+                      task.is_completed === false
+                  ).length === 0 ? (
                     <p>No tasks found</p>
                   ) : (
                     <>
                       {tasks
-                        .filter((task: any) => task.category === category.id)
+                        .filter(
+                          (task: any) =>
+                            task.category === category.id &&
+                            task.is_completed === false
+                        )
                         .map((task: any) => (
                           <TaskItem
                             key={task.id}
@@ -113,6 +123,30 @@ const MyTasks = () => {
                 </AccordionContent>
               </AccordionItem>
             ))}
+
+            <AccordionItem value="completed">
+              <AccordionTrigger className="text-lg font-semibold">
+                Completed
+              </AccordionTrigger>
+              <AccordionContent>
+                {tasks.filter((task: any) => task.is_completed === true)
+                  .length === 0 ? (
+                  <p>No completed tasks found</p>
+                ) : (
+                  <>
+                    {tasks
+                      .filter((task: any) => task.is_completed === true)
+                      .map((task: any) => (
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          onRefresh={fetchTasks}
+                        />
+                      ))}
+                  </>
+                )}
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </div>
       )}
