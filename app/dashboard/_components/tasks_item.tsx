@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 import { Star, Bell, CalendarClock, Delete } from "lucide-react";
 import DeleteTaskBtn from "./delete_task_btn";
+import { toast } from "sonner";
 
 const TaskItem = ({
   task,
@@ -16,6 +17,8 @@ const TaskItem = ({
 }) => {
   const [categoryName, setCategoryName] = useState("");
   const [categoryColor, setCategoryColor] = useState("");
+
+  const [isDone, setIsDone] = useState(task.is_completed);
 
   const getCategory = async () => {
     try {
@@ -36,6 +39,32 @@ const TaskItem = ({
     }
   };
 
+  const markTask = async () => {
+    try {
+      const res = await fetch(`/api/v1/task/mark/${task.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_done: !isDone }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 400 || res.status === 500) {
+        toast.error(data.message);
+        return;
+      }
+
+      toast.success(data.message);
+      setIsDone(!isDone);
+      onRefresh();
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
+
   useEffect(() => {
     getCategory();
   }, []);
@@ -53,10 +82,18 @@ const TaskItem = ({
   return (
     <li className="border border-sidebar-accent p-4 rounded-2xl flex justify-between">
       <div className="flex items-center gap-3">
-        <Input type="checkbox" className="w-6 h-6" />
+        <Input
+          type="checkbox"
+          className="w-6 h-6"
+          checked={task.is_completed}
+          onChange={() => markTask()}
+        />
         <div className="w-[40vw]">
           <div className="flex items-center gap-3">
-            <span className="text-lg">{task.title}</span>
+            <span
+              className={`text-lg ${task.is_completed ? "line-through" : ""}`}>
+              {task.title}
+            </span>
             {task.is_important && <Star size={16} fill="yellow" />}
             {task.is_reminder && <Bell size={16} fill="grey" />}
             <p className="text-sm flex items-center gap-2">
