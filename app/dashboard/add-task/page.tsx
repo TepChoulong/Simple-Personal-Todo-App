@@ -46,7 +46,7 @@ const AddTask = () => {
     title: "",
     description: "",
     priority: "low",
-    category: "uncategorized",
+    category: "Uncategorized",
     due_date: null,
     is_completed: false,
     is_reminder: false,
@@ -103,13 +103,6 @@ const AddTask = () => {
       setLoading(false);
       toast.error("Something went wrong");
     }
-  };
-
-  console.log(dataForm);
-
-  const formatDate = (date: string) => {
-    if (date === null) return null;
-    return new Date(date).toISOString().split("T")[0];
   };
 
   const fetchCategories = async () => {
@@ -236,7 +229,6 @@ const AddTask = () => {
               Category
             </Label>
             <Select
-              value={dataForm.category}
               onValueChange={(e) => setDataForm({ ...dataForm, category: e })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a category" />
@@ -244,18 +236,11 @@ const AddTask = () => {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Categories</SelectLabel>
-                  {categories.length === 0 ? (
-                    <SelectItem value="uncategorized">None</SelectItem>
-                  ) : (
-                    <>
-                      <SelectItem value="uncategorized">None</SelectItem>
-                      {categories.map((category: Category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </>
-                  )}
+                  {categories.map((category: Category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
