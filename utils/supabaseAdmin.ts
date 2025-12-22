@@ -2,20 +2,18 @@ import { createClient } from "@supabase/supabase-js";
 
 import { auth } from "@clerk/nextjs/server";
 
-export default async function supabase() {
+export default async function supabaseAdmin() {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_KEY;
-  const { getToken } = await auth();
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Missing Supabase credentials");
   }
 
   return createClient(supabaseUrl, supabaseKey, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${await getToken()}`,
-      },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
     },
   });
 }
