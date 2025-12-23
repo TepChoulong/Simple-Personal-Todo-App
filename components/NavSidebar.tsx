@@ -4,12 +4,15 @@ import Image from "next/image";
 
 import { currentUser } from "@clerk/nextjs/server";
 
+import { SignOutButton } from "@clerk/nextjs";
+
 import {
   LayoutDashboard,
   SquareCheckBig,
   CalendarDays,
   Tag,
   LogOut,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -25,6 +28,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 type NavItem = {
   title: string;
@@ -55,6 +59,11 @@ const NavSidebar = async () => {
       title: "Categories",
       url: "/dashboard/categories",
       icon: <Tag />,
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: <Settings />,
     },
   ];
 
@@ -101,10 +110,12 @@ const NavSidebar = async () => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size={"lg"}>
-              <Link href="/">
-                <LogOut />
-                <span>Logout</span>
-              </Link>
+              <SignOutButton>
+                <div className="flex items-center gap-2">
+                  <LogOut />
+                  <span>Logout</span>
+                </div>
+              </SignOutButton>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
